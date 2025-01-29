@@ -12,3 +12,12 @@ help:
 build: ## Build the wasi component
 	cargo build --target wasm32-wasip2 --release
 	cp ./target/wasm32-wasip2/release/example_rs_component.wasm dc_component.wasm
+
+test: ## Test the component on host platform
+	cargo test --lib
+
+test.coverage:
+	cargo llvm-cov --all-features
+
+test.coverage.html:
+	cargo llvm-cov --all-features --open
