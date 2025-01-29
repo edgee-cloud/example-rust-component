@@ -7,7 +7,7 @@ export!(Component);
 struct Component;
 
 impl Guest for Component {
-    fn page(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn page(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/page"),
@@ -16,7 +16,7 @@ impl Guest for Component {
         })
     }
 
-    fn track(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn track(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/track"),
