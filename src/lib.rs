@@ -23,7 +23,10 @@ impl Guest for Component {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "page"),
-            headers: Vec::new(),
+            headers: vec![
+                ("Content-Type".to_string(), "application/json".to_string()),
+                ("Authorization".to_string(), "Bearer XYZ".to_string()),
+            ],
             body: String::new(),
         })
     }
@@ -32,7 +35,10 @@ impl Guest for Component {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "track"),
-            headers: Vec::new(),
+            headers: vec![
+                ("Content-Type".to_string(), "application/json".to_string()),
+                ("Authorization".to_string(), "Bearer XYZ".to_string()),
+            ],
             body: String::new(),
         })
     }
@@ -41,7 +47,10 @@ impl Guest for Component {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "user"),
-            headers: Vec::new(),
+            headers: vec![
+                ("Content-Type".to_string(), "application/json".to_string()),
+                ("Authorization".to_string(), "Bearer XYZ".to_string()),
+            ],
             body: String::new(),
         })
     }
