@@ -61,7 +61,7 @@ mod tests {
     use super::*;
 
     use crate::exports::edgee::protocols::data_collection::{
-        Campaign, Client, Context, Data, EventType, PageData, Session, TrackData, UserData,
+        Campaign, Client, Context, Data, EventType, PageData, Session, UserData,
     };
     use exports::edgee::protocols::data_collection::Consent;
     use pretty_assertions::assert_eq;
@@ -159,85 +159,6 @@ mod tests {
             context: sample_context(edgee_id, locale, session_start),
             consent,
         }
-    }
-
-    fn sample_track_data(event_name: String) -> TrackData {
-        TrackData {
-            name: event_name,
-            products: vec![
-                vec![("sku".to_string(), "SKU_12345".to_string())],
-                vec![("name".to_string(), "Stan and Friends Tee".to_string())],
-                vec![(
-                    "affiliation".to_string(),
-                    "Google Merchandise Store".to_string(),
-                )],
-                vec![("coupon".to_string(), "SUMMER_FUN".to_string())],
-                vec![("discount".to_string(), "2.22".to_string())],
-                vec![("index".to_string(), "0".to_string())],
-                vec![("brand".to_string(), "Google".to_string())],
-                vec![("category".to_string(), "Apparel".to_string())],
-                vec![("category2".to_string(), "Adult".to_string())],
-                vec![("category3".to_string(), "Shirts".to_string())],
-                vec![("category4".to_string(), "Crew".to_string())],
-                vec![("category5".to_string(), "Short sleeve".to_string())],
-                vec![("list_id".to_string(), "related_products".to_string())],
-                vec![("list_name".to_string(), "Related Products".to_string())],
-                vec![("variant".to_string(), "green".to_string())],
-                vec![(
-                    "location_id".to_string(),
-                    "ChIJIQBpAG2ahYAR_6128GcTUEo".to_string(),
-                )],
-                vec![("price".to_string(), "10.1".to_string())],
-                vec![("quantity".to_string(), "3".to_string())],
-                vec![("custom-property".to_string(), "whatever".to_string())],
-            ],
-            properties: vec![
-                ("prop1".to_string(), "value1".to_string()),
-                ("prop2".to_string(), "10".to_string()),
-                ("currency".to_string(), "USD".to_string()),
-            ],
-        }
-    }
-
-    fn sample_track_event(
-        event_name: String,
-        consent: Option<Consent>,
-        edgee_id: String,
-        locale: String,
-        session_start: bool,
-    ) -> Event {
-        Event {
-            uuid: Uuid::new_v4().to_string(),
-            timestamp: 123,
-            timestamp_millis: 123,
-            timestamp_micros: 123,
-            event_type: EventType::Track,
-            data: Data::Track(sample_track_data(event_name)),
-            context: sample_context(edgee_id, locale, session_start),
-            consent,
-        }
-    }
-
-    fn sample_user_event(
-        consent: Option<Consent>,
-        edgee_id: String,
-        locale: String,
-        session_start: bool,
-    ) -> Event {
-        Event {
-            uuid: Uuid::new_v4().to_string(),
-            timestamp: 123,
-            timestamp_millis: 123,
-            timestamp_micros: 123,
-            event_type: EventType::User,
-            data: Data::User(sample_user_data(edgee_id.clone())),
-            context: sample_context(edgee_id, locale, session_start),
-            consent,
-        }
-    }
-
-    fn sample_credentials() -> Vec<(String, String)> {
-        vec![("ga_measurement_id".to_string(), "abc".to_string())]
     }
 
     #[test]
