@@ -19,7 +19,8 @@ struct Component;
 */
 
 impl Guest for Component {
-    fn page(_edgee_event: Event, _settings: Dict) -> Result<EdgeeRequest, String> {
+    #[allow(unused_variables)]
+    fn page(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "page"),
@@ -32,7 +33,8 @@ impl Guest for Component {
         })
     }
 
-    fn track(_edgee_event: Event, _settings: Dict) -> Result<EdgeeRequest, String> {
+    #[allow(unused_variables)]
+    fn track(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "track"),
@@ -45,7 +47,8 @@ impl Guest for Component {
         })
     }
 
-    fn user(_edgee_event: Event, _settings: Dict) -> Result<EdgeeRequest, String> {
+    #[allow(unused_variables)]
+    fn user(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "user"),
