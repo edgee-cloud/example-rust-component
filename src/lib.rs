@@ -28,6 +28,7 @@ impl Guest for Component {
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
             body: String::new(),
+            forward_client_headers: true,
         })
     }
 
@@ -40,6 +41,7 @@ impl Guest for Component {
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
             body: String::new(),
+            forward_client_headers: true,
         })
     }
 
@@ -52,6 +54,7 @@ impl Guest for Component {
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
             body: String::new(),
+            forward_client_headers: true,
         })
     }
 }
