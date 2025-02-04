@@ -19,7 +19,7 @@ struct Component;
 */
 
 impl Guest for Component {
-    fn page(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn page(_edgee_event: Event, _settings: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "page"),
@@ -32,7 +32,7 @@ impl Guest for Component {
         })
     }
 
-    fn track(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn track(_edgee_event: Event, _settings: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "track"),
@@ -45,7 +45,7 @@ impl Guest for Component {
         })
     }
 
-    fn user(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn user(_edgee_event: Event, _settings: Dict) -> Result<EdgeeRequest, String> {
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "user"),
@@ -172,8 +172,8 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = vec![("your-credentials".to_string(), "abc".to_string())];
-        let result = Component::page(event, credentials);
+        let settings = vec![("your-credentials".to_string(), "abc".to_string())];
+        let result = Component::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
