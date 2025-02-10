@@ -7,5 +7,5 @@ version = "1.0.0"
 wit-world-version = "0.4.0"
 
 [package.build]
-command = "cargo build --target wasm32-wasip2 --release --target-dir ./target"
-output_path = "target/wasm32-wasip2/release/example_rust_component.wasm"
+command = "cargo build --target wasm32-wasip2 --release --target-dir ./target && mv ./target/wasm32-wasip2/release/example_rust_component.wasm ./dc_component.wasm"
+output_path = "dc_component.wasm"
