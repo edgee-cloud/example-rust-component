@@ -4,6 +4,11 @@ manifest_version = 1
 name = "example-rust-component"
 version = "1.0.0"
 
+category = "data-collection"
+subcategory = "analytics"
+description = "Example Rust component for data collection"
+documentation = "https://github.com/edgee-cloud/example-rust-component"
+repository = "https://github.com/edgee-cloud/example-rust-component"
 wit-world-version = "0.4.0"
 
 [package.build]
