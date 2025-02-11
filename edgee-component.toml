@@ -1,0 +1,16 @@
+manifest_version = 1
+
+[package]
+name = "example-rust-component"
+version = "1.0.0"
+
+category = "data-collection"
+subcategory = "analytics"
+description = "Example Rust component for data collection"
+documentation = "https://github.com/edgee-cloud/example-rust-component"
+repository = "https://github.com/edgee-cloud/example-rust-component"
+wit-world-version = "0.4.0"
+
+[package.build]
+command = "cargo build --target wasm32-wasip2 --release --target-dir ./target && mv ./target/wasm32-wasip2/release/example_rust_component.wasm ./dc_component.wasm"
+output_path = "dc_component.wasm"
