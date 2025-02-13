@@ -92,9 +92,7 @@ impl Settings {
             .map(String::to_string)
             .unwrap_or_default();
 
-        Ok(Self {
-            example
-        })
+        Ok(Self { example })
     }
 }
 
