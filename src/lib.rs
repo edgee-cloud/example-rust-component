@@ -30,7 +30,7 @@ impl Guest for Component {
                 ("Content-Type".to_string(), "application/json".to_string()),
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
-            body: String::from(settings.example),
+            body: settings.example,
             forward_client_headers: true,
         })
     }
@@ -45,7 +45,7 @@ impl Guest for Component {
                 ("Content-Type".to_string(), "application/json".to_string()),
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
-            body: String::from(settings.example),
+            body: settings.example,
             forward_client_headers: true,
         })
     }
@@ -60,7 +60,7 @@ impl Guest for Component {
                 ("Content-Type".to_string(), "application/json".to_string()),
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
-            body: String::from(settings.example),
+            body: settings.example,
             forward_client_headers: true,
         })
     }
