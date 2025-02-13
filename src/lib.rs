@@ -1,5 +1,6 @@
 use crate::exports::edgee::protocols::data_collection::{Dict, EdgeeRequest, Event, HttpMethod};
 use exports::edgee::protocols::data_collection::Guest;
+use std::collections::HashMap;
 
 wit_bindgen::generate!({world: "data-collection", path: "wit", generate_all});
 export!(Component);
@@ -20,7 +21,8 @@ struct Component;
 
 impl Guest for Component {
     #[allow(unused_variables)]
-    fn page(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
+    fn page(edgee_event: Event, settings_dict: Dict) -> Result<EdgeeRequest, String> {
+        let settings = Settings::new(settings_dict).map_err(|e| e.to_string())?;
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "page"),
@@ -28,13 +30,14 @@ impl Guest for Component {
                 ("Content-Type".to_string(), "application/json".to_string()),
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
-            body: String::new(),
+            body: settings.example,
             forward_client_headers: true,
         })
     }
 
     #[allow(unused_variables)]
-    fn track(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
+    fn track(edgee_event: Event, settings_dict: Dict) -> Result<EdgeeRequest, String> {
+        let settings = Settings::new(settings_dict).map_err(|e| e.to_string())?;
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "track"),
@@ -42,13 +45,14 @@ impl Guest for Component {
                 ("Content-Type".to_string(), "application/json".to_string()),
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
-            body: String::new(),
+            body: settings.example,
             forward_client_headers: true,
         })
     }
 
     #[allow(unused_variables)]
-    fn user(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
+    fn user(edgee_event: Event, settings_dict: Dict) -> Result<EdgeeRequest, String> {
+        let settings = Settings::new(settings_dict).map_err(|e| e.to_string())?;
         Ok(EdgeeRequest {
             method: HttpMethod::Post,
             url: format!("https://example.com/{}", "user"),
@@ -56,9 +60,39 @@ impl Guest for Component {
                 ("Content-Type".to_string(), "application/json".to_string()),
                 ("Authorization".to_string(), "Bearer XYZ".to_string()),
             ],
-            body: String::new(),
+            body: settings.example,
             forward_client_headers: true,
         })
+    }
+}
+
+pub struct Settings {
+    pub example: String,
+}
+
+impl Settings {
+    pub fn new(settings_dict: Dict) -> anyhow::Result<Self> {
+        let settings_map: HashMap<String, String> = settings_dict
+            .iter()
+            .map(|(key, value)| (key.to_string(), value.to_string()))
+            .collect();
+
+        /*
+        // required setting
+        // also needs -> use anyhow::Context;
+        let example = settings_map
+            .get("example")
+            .context("Missing example setting")?
+            .to_string();
+        */
+
+        // optional setting
+        let example = settings_map
+            .get("example")
+            .map(String::to_string)
+            .unwrap_or_default();
+
+        Ok(Self { example })
     }
 }
 

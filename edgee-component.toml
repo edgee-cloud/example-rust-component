@@ -1,6 +1,6 @@
 manifest_version = 1
 
-[package]
+[component]
 name = "example-rust-component"
 version = "1.0.0"
 
@@ -11,6 +11,10 @@ documentation = "https://github.com/edgee-cloud/example-rust-component"
 repository = "https://github.com/edgee-cloud/example-rust-component"
 wit-world-version = "0.4.0"
 
-[package.build]
+[component.build]
 command = "cargo build --target wasm32-wasip2 --release --target-dir ./target && mv ./target/wasm32-wasip2/release/example_rust_component.wasm ./dc_component.wasm"
 output_path = "dc_component.wasm"
+
+[component.settings.example]
+title = "Example Config Field"
+type = "string"
