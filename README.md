@@ -15,9 +15,9 @@ This is an example of a Rust Edgee Component.
 
 ## Setup
 Requirements:
-- cargo 
+- cargo
 - wit-deps
-- [edgee-cli] (https://github.com/edgee-cloud/edgee)
+- [edgee-cli](https://github.com/edgee-cloud/edgee)
 
 ## Building
 
