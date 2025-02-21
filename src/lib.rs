@@ -1,5 +1,5 @@
-use crate::exports::edgee::protocols::data_collection::{Dict, EdgeeRequest, Event, HttpMethod};
-use exports::edgee::protocols::data_collection::Guest;
+use crate::exports::edgee::components::data_collection::{Dict, EdgeeRequest, Event, HttpMethod};
+use exports::edgee::components::data_collection::Guest;
 use std::collections::HashMap;
 
 wit_bindgen::generate!({world: "data-collection", path: "wit", generate_all});
@@ -100,10 +100,10 @@ impl Settings {
 mod tests {
     use super::*;
 
-    use crate::exports::edgee::protocols::data_collection::{
+    use crate::exports::edgee::components::data_collection::{
         Campaign, Client, Context, Data, EventType, PageData, Session, UserData,
     };
-    use exports::edgee::protocols::data_collection::Consent;
+    use exports::edgee::components::data_collection::Consent;
     use pretty_assertions::assert_eq;
     use uuid::Uuid;
 
