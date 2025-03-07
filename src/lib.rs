@@ -2,7 +2,7 @@ use crate::exports::edgee::components::data_collection::{Dict, EdgeeRequest, Eve
 use exports::edgee::components::data_collection::Guest;
 use std::collections::HashMap;
 
-wit_bindgen::generate!({world: "data-collection", path: "wit", generate_all});
+wit_bindgen::generate!({world: "data-collection", path: ".edgee/wit", generate_all});
 export!(Component);
 
 struct Component;
