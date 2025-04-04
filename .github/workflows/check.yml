@@ -64,7 +64,7 @@ jobs:
       - run: edgee component build
       - name: Verify .wasm file exists
         run: |
-          if [ ! -f "./dc_component." ]; then
+          if [ ! -f "./dc_component.wasm" ]; then
               echo "❌ Error: dc_component.wasm not found" >&2
               exit 1
           fi
