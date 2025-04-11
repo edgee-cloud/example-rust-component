@@ -52,7 +52,7 @@ pub struct MyCookies {
 
 impl MyCookies {
     pub fn new(cookies: Dict) -> anyhow::Result<Self> {
-        let settings_map: HashMap<String, String> = cookies
+        let cookies_map: HashMap<String, String> = cookies
             .iter()
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
