@@ -48,7 +48,6 @@ impl Guest for Component {
 pub struct MyCookies {
     // the cookies you want to parse
     pub cookie_key: Option<String>,
-    pub cookie_key_1: Option<String>,
 }
 
 impl MyCookies {
