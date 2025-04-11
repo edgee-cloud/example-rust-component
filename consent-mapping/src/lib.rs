@@ -42,7 +42,6 @@ impl Guest for Component {
 /*
 * {
 *   "cookie_key": "true",
-*   "cookie_key_1": "examplevalue1|examplevalue2",
 *   ...
 * }
 */
