@@ -25,8 +25,9 @@ struct Component;
 
 impl Guest for Component {
     #[allow(unused_variables)]
-    fn map(cookie: Dict, settings_dict: Dict) -> Option<Consent> {
-        let my_cookies = MyCookies::new(cookie).unwrap();
+    fn map(cookies: Dict, settings_dict: Dict) -> Option<Consent> {
+        let settings = Settings::new(settings_dict).unwrap();
+        let my_cookies = MyCookies::new(cookies).unwrap();
         if let Some(cookie_key) = my_cookies.cookie_key {
             if cookie_key == "true" {
                 return Some(Consent::Granted);
