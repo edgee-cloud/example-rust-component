@@ -58,12 +58,8 @@ impl MyCookies {
             .collect();
 
         // parse your cookies here
-        let cookie_key = settings_map.get("cookie_key").cloned();
-        let cookie_key_1 = settings_map.get("cookie_key_1").cloned();
-        Ok(Self {
-            cookie_key,
-            cookie_key_1,
-        })
+        let cookie_key = cookies_map.get("cookie_key").cloned();
+        Ok(Self { cookie_key })
     }
 }
 
