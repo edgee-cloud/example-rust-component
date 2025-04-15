@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dir: [consent-mapping, data-collection]
+        dir: [consent-management, data-collection]
     defaults:
       run:
         working-directory: ${{ matrix.dir }}
