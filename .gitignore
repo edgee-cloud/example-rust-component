@@ -4,7 +4,7 @@ debug/
 target/
 .edgee/
 data-collection/dc_component.wasm
-consent-mapping/cmp_component.wasm
+consent-management/cmp_component.wasm
 
 
 # Remove Cargo.lock from gitignore if creating an executable, leave it for libraries
