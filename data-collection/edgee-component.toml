@@ -1,7 +1,7 @@
 manifest-version = 1
 
 [component]
-name = "example-rust-component"
+name = "example-rust-data-collection-component"
 version = "1.0.0"
 
 category = "data-collection"
