@@ -4,7 +4,7 @@ manifest-version = 1
 name = "example-rust-component"
 version = "1.0.0"
 
-category = "consent-mapping"
+category = "consent-management"
 subcategory = "consent-mapping"
 description = "Example Rust component for consent-mapping"
 documentation = "https://github.com/edgee-cloud/example-rust-component"

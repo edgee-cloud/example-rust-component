@@ -1,10 +1,10 @@
-use exports::edgee::components::consent_mapping::Consent;
-use exports::edgee::components::consent_mapping::Dict;
-use exports::edgee::components::consent_mapping::Guest;
+wit_bindgen::generate!({world: "consent-management", path: ".edgee/wit", generate_all});
+use exports::edgee::components::consent_management::Consent;
+use exports::edgee::components::consent_management::Dict;
+use exports::edgee::components::consent_management::Guest;
 
 use std::collections::HashMap;
 
-wit_bindgen::generate!({world: "consent-mapping", path: ".edgee/wit", generate_all});
 export!(Component);
 
 struct Component;
