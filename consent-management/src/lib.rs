@@ -33,9 +33,11 @@ impl Guest for Component {
                 return Some(Consent::Granted);
             } else if cookie_key == "false" {
                 return Some(Consent::Denied);
+            } else {
+                return Some(Consent::Pending);
             }
         }
-        Some(Consent::Pending)
+        None
     }
 }
 
