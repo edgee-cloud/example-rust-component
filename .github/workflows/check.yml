@@ -37,6 +37,7 @@ jobs:
         run: cargo check
 
       - name: Cargo Fmt Check
+        run: ls
         run: cargo fmt --all -- --check
 
       - name: Clippy Lint
