@@ -43,6 +43,7 @@ jobs:
         uses: wearerequired/lint-action@master
         with:
           clippy: true
+          clippy_dir: ${{ matrix.dir }}
 
       - name: Cargo Build
         run: edgee component build
