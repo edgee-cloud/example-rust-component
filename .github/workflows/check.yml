@@ -37,7 +37,9 @@ jobs:
         run: cargo check
 
       - name: Cargo Fmt Check
-        run: ls
+        uses: actions-rust-lang/rustfmt@v1
+        with:
+            manifest-path: ${{ matrix.dir }}/Cargo.toml
 
       - name: Clippy Lint
         uses: wearerequired/lint-action@master
