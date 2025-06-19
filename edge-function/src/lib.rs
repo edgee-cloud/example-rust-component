@@ -24,7 +24,7 @@ impl Guest for Component {
 
         // request example.com
         let out_req = OutgoingRequest::new(Fields::new());
-        let url = Url::parse("https://example.com").unwrap();
+        let url = Url::parse("https://www.edgee.cloud/_edgee/status").unwrap();
         out_req.set_scheme(Some(&wasi::http::types::Scheme::Https));
         out_req.set_authority(Some(url.authority()));
         out_req.set_path_with_query(Some(url.path()));
