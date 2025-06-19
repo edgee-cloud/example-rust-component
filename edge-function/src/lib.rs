@@ -8,7 +8,6 @@ use wasi::http::types::{Fields, OutgoingBody, OutgoingResponse};
 
 use wasi::http::outgoing_handler::OutgoingRequest;
 
-use serde_json;
 use url::Url;
 
 impl Guest for Component {
