@@ -15,3 +15,7 @@ wit-version = "1.0.0"
 [component.build]
 command = "cargo build --target wasm32-wasip2 --release --target-dir ./target && mv ./target/wasm32-wasip2/release/example_rust_component.wasm ./component.wasm"
 output_path = "component.wasm"
+
+[component.settings.example]
+title = "Example Config Field"
+type = "string"
