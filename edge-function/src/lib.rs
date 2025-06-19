@@ -3,15 +3,32 @@ export!(Component);
 struct Component;
 
 use exports::wasi::http::incoming_handler::{Guest, ResponseOutparam};
+use wasi::http::types::IncomingRequest;
 use wasi::http::types::{Fields, OutgoingBody, OutgoingResponse};
 
 use wasi::http::outgoing_handler::OutgoingRequest;
 
+use serde::{Deserialize, Serialize};
+use serde_json;
+use std::collections::HashMap;
 use url::Url;
 
 impl Guest for Component {
     fn handle(req: wasi::http::types::IncomingRequest, resp: wasi::http::types::ResponseOutparam) {
-        //let incoming_headers = IncomingRequest::headers(&req);
+        let incoming_headers = IncomingRequest::headers(&req);
+        let settings_headers = incoming_headers.get("X-Edgee-Settings");
+        // Parse the settings from the headers
+        if settings_headers.len() != 1 {
+            panic!("Multiple X-Edgee-Settings headers found");
+        }
+        let settings = settings_headers.get(0).cloned();
+        let settings = match settings {
+            Some(settings) => String::from_utf8_lossy(&settings).to_string(),
+            None => {
+                panic!("X-Edgee-Settings header not found");
+            }
+        };
+        let settings = Settings::new(settings).unwrap();
         // let incoming_body = IncomingRequest::consume(&req).unwrap();
         // let incoming_body_stream = incoming_body.stream().unwrap();
         //       let body = incoming_body_stream.read().unwrap();
@@ -49,5 +66,17 @@ impl Guest for Component {
         drop(stream);
         // this tells the host that the response is complete
         let _ = OutgoingBody::finish(body, None);
+    }
+}
+
+#[derive(serde::Deserialize, serde::Serialize)]
+pub struct Settings {
+    pub example: String,
+}
+
+impl Settings {
+    pub fn new(settings_headers: String) -> anyhow::Result<Self> {
+        serde_json::from_str(&settings_headers)
+            .map_err(|e| anyhow::anyhow!("Failed to parse settings: {}", e))
     }
 }
