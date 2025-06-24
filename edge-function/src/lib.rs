@@ -36,7 +36,19 @@ impl Guest for Component {
             vec!["text/html".as_bytes().to_vec()].as_slice(),
         );
 
+        let _ = response_headers.set(
+            "content-length",
+            vec![include_str!("index.html")
+                .len()
+                .to_string()
+                .as_bytes()
+                .to_vec()]
+            .as_slice(),
+        );
+
         let index = include_str!("index.html");
+
+        println!("index: {}", index);
 
         // request example.com
         //let out_req = OutgoingRequest::new(Fields::new());
