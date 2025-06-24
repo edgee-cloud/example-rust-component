@@ -48,30 +48,14 @@ impl Guest for Component {
 
         let index = include_str!("index.html");
 
-        // request example.com
-        //let out_req = OutgoingRequest::new(Fields::new());
-        //let url = Url::parse("https://www.edgee.cloud/_edgee/status").unwrap();
-        //out_req.set_scheme(Some(&wasi::http::types::Scheme::Https));
-        //out_req.set_authority(Some(url.authority()));
-        //out_req.set_path_with_query(Some(url.path()));
-        //let fut = wasi::http::outgoing_handler::handle(out_req, None).unwrap();
-        //fut.subscribe().block();
-        //let fut_resp = fut.get();
-        //let response = fut_resp.unwrap().unwrap().unwrap().consume().unwrap();
-        //let example_stream = response.stream().unwrap();
-
         // stream
         let resp_tx = OutgoingResponse::new(response_headers);
         let _ = resp_tx.set_status_code(200);
         let body = resp_tx.body().unwrap();
         ResponseOutparam::set(resp, Ok(resp_tx));
-
         // stream the response body
         let stream = body.write().unwrap();
         stream.write(index.as_bytes()).unwrap();
-        //while let Ok(chunk) = example_stream.read(8192) {
-        //    let _ = stream.write(&chunk);
-        //}
         // finish the response -> drop flushes the stream
         drop(stream);
         // this tells the host that the response is complete
