@@ -13,19 +13,19 @@ use url::Url;
 impl Guest for Component {
     fn handle(req: wasi::http::types::IncomingRequest, resp: wasi::http::types::ResponseOutparam) {
         let incoming_headers = IncomingRequest::headers(&req);
-        let settings_headers = incoming_headers.get("X-Edgee-Settings");
-        // Parse the settings from the headers
-        if settings_headers.len() != 1 {
-            panic!("Multiple X-Edgee-Settings headers found");
-        }
-        let settings = settings_headers.get(0).cloned();
-        let settings = match settings {
-            Some(settings) => String::from_utf8_lossy(&settings).to_string(),
-            None => {
-                panic!("X-Edgee-Settings header not found");
-            }
-        };
-        let settings = Settings::new(settings).unwrap();
+        //let settings_headers = incoming_headers.get("X-Edgee-Settings");
+        //// Parse the settings from the headers
+        //if settings_headers.len() != 1 {
+        //    panic!("Multiple X-Edgee-Settings headers found");
+        //}
+        //let settings = settings_headers.get(0).cloned();
+        //let settings = match settings {
+        //    Some(settings) => String::from_utf8_lossy(&settings).to_string(),
+        //    None => {
+        //        panic!("X-Edgee-Settings header not found");
+        //    }
+        //};
+        //let settings = Settings::new(settings).unwrap();
         // let incoming_body = IncomingRequest::consume(&req).unwrap();
         // let incoming_body_stream = incoming_body.stream().unwrap();
         //       let body = incoming_body_stream.read().unwrap();
@@ -36,17 +36,19 @@ impl Guest for Component {
             vec!["text/html".as_bytes().to_vec()].as_slice(),
         );
 
+        let index = include_str!("index.html");
+
         // request example.com
-        let out_req = OutgoingRequest::new(Fields::new());
-        let url = Url::parse("https://www.edgee.cloud/_edgee/status").unwrap();
-        out_req.set_scheme(Some(&wasi::http::types::Scheme::Https));
-        out_req.set_authority(Some(url.authority()));
-        out_req.set_path_with_query(Some(url.path()));
-        let fut = wasi::http::outgoing_handler::handle(out_req, None).unwrap();
-        fut.subscribe().block();
-        let fut_resp = fut.get();
-        let response = fut_resp.unwrap().unwrap().unwrap().consume().unwrap();
-        let example_stream = response.stream().unwrap();
+        //let out_req = OutgoingRequest::new(Fields::new());
+        //let url = Url::parse("https://www.edgee.cloud/_edgee/status").unwrap();
+        //out_req.set_scheme(Some(&wasi::http::types::Scheme::Https));
+        //out_req.set_authority(Some(url.authority()));
+        //out_req.set_path_with_query(Some(url.path()));
+        //let fut = wasi::http::outgoing_handler::handle(out_req, None).unwrap();
+        //fut.subscribe().block();
+        //let fut_resp = fut.get();
+        //let response = fut_resp.unwrap().unwrap().unwrap().consume().unwrap();
+        //let example_stream = response.stream().unwrap();
 
         // stream
         let resp_tx = OutgoingResponse::new(response_headers);
@@ -56,9 +58,10 @@ impl Guest for Component {
 
         // stream the response body
         let stream = body.write().unwrap();
-        while let Ok(chunk) = example_stream.read(8192) {
-            let _ = stream.write(&chunk);
-        }
+        stream.write(index.as_bytes()).unwrap();
+        //while let Ok(chunk) = example_stream.read(8192) {
+        //    let _ = stream.write(&chunk);
+        //}
         // finish the response -> drop flushes the stream
         drop(stream);
         // this tells the host that the response is complete
