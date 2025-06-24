@@ -2,7 +2,7 @@ manifest-version = 1
 
 [component]
 name = "example-rust-edge-function-component"
-version = "6.0.0"
+version = "1.0.0"
 
 category = "edge-function"
 subcategory = "wasm-function"
