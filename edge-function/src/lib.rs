@@ -27,6 +27,11 @@ impl ResponseBuilder {
         }
     }
 
+    pub fn set_headers(&mut self, headers: Fields) -> &mut Self {
+        self.headers = headers;
+        self
+    }
+
     pub fn set_header(&mut self, key: &str, value: &str) -> &mut Self {
         let _ = self
             .headers
@@ -45,16 +50,16 @@ impl ResponseBuilder {
     }
 
     pub fn build(self, resp: ResponseOutparam) {
-        let mut resp_tx = OutgoingResponse::new(self.headers);
+        let resp_tx = OutgoingResponse::new(self.headers);
         let _ = resp_tx.set_status_code(self.status_code);
 
         if let Some(body_content) = self.body_content {
             let body = resp_tx.body().unwrap();
             ResponseOutparam::set(resp, Ok(resp_tx));
 
-            let mut stream = body.write().unwrap();
+            let stream = body.write().unwrap();
             stream.write(body_content.as_bytes()).unwrap();
-            drop(stream);
+            stream.flush().unwrap();
 
             let _ = OutgoingBody::finish(body, None);
         }
@@ -93,14 +98,18 @@ impl Guest for Component {
         //let fut_resp = fut.get();
         //let response = fut_resp.unwrap().unwrap().unwrap().consume().unwrap();
         //let example_stream = response.stream().unwrap();
+        //
+        let p_q = req.path_with_query().unwrap_or_default();
+        println!("Request received: {:?}", p_q);
 
         let mut builder = ResponseBuilder::new();
         builder
-            .set_header("content-type", "text/html")
-            .set_header(
-                "content-length",
-                &include_str!("index.html").len().to_string(),
-            )
+            .set_headers(incoming_headers)
+            //.set_header("content-type", "text/html")
+            //.set_header(
+            //    "content-length",
+            //    &include_str!("index.html").len().to_string(),
+            //)
             .set_status_code(200)
             .set_body(include_str!("index.html"));
         builder.build(resp);
