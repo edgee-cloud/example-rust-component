@@ -6,65 +6,9 @@ use exports::wasi::http::incoming_handler::{Guest, ResponseOutparam};
 use wasi::http::types::IncomingRequest;
 use wasi::http::types::{Fields, OutgoingBody, OutgoingResponse};
 
-pub struct ResponseBuilder {
-    headers: Fields,
-    status_code: u16,
-    body_content: Option<String>,
-}
+use wasi::http::outgoing_handler::OutgoingRequest;
 
-impl Default for ResponseBuilder {
-    fn default() -> Self {
-        ResponseBuilder::new()
-    }
-}
-
-impl ResponseBuilder {
-    pub fn new() -> Self {
-        ResponseBuilder {
-            headers: Fields::new(),
-            status_code: 200,
-            body_content: None,
-        }
-    }
-
-    pub fn set_headers(&mut self, headers: Fields) -> &mut Self {
-        self.headers = headers;
-        self
-    }
-
-    pub fn set_header(&mut self, key: &str, value: &str) -> &mut Self {
-        let _ = self
-            .headers
-            .set(key, vec![value.as_bytes().to_vec()].as_slice());
-        self
-    }
-
-    pub fn set_status_code(&mut self, status_code: u16) -> &mut Self {
-        self.status_code = status_code;
-        self
-    }
-
-    pub fn set_body(&mut self, body: &str) -> &mut Self {
-        self.body_content = Some(body.to_string());
-        self
-    }
-
-    pub fn build(self, resp: ResponseOutparam) {
-        let resp_tx = OutgoingResponse::new(self.headers);
-        let _ = resp_tx.set_status_code(self.status_code);
-
-        if let Some(body_content) = self.body_content {
-            let body = resp_tx.body().unwrap();
-            ResponseOutparam::set(resp, Ok(resp_tx));
-
-            let stream = body.write().unwrap();
-            stream.write(body_content.as_bytes()).unwrap();
-            stream.flush().unwrap();
-
-            let _ = OutgoingBody::finish(body, None);
-        }
-    }
-}
+use url::Url;
 
 impl Guest for Component {
     fn handle(req: wasi::http::types::IncomingRequest, resp: wasi::http::types::ResponseOutparam) {
@@ -85,7 +29,24 @@ impl Guest for Component {
         // let incoming_body = IncomingRequest::consume(&req).unwrap();
         // let incoming_body_stream = incoming_body.stream().unwrap();
         //       let body = incoming_body_stream.read().unwrap();
-        //
+        let response_headers = Fields::new();
+
+        let _ = response_headers.set(
+            "content-type",
+            vec!["text/html".as_bytes().to_vec()].as_slice(),
+        );
+
+        let _ = response_headers.set(
+            "content-length",
+            vec![include_str!("index.html")
+                .len()
+                .to_string()
+                .as_bytes()
+                .to_vec()]
+            .as_slice(),
+        );
+
+        let index = include_str!("index.html");
 
         // request example.com
         //let out_req = OutgoingRequest::new(Fields::new());
@@ -98,21 +59,23 @@ impl Guest for Component {
         //let fut_resp = fut.get();
         //let response = fut_resp.unwrap().unwrap().unwrap().consume().unwrap();
         //let example_stream = response.stream().unwrap();
-        //
-        let p_q = req.path_with_query().unwrap_or_default();
-        println!("Request received: {:?}", p_q);
 
-        let mut builder = ResponseBuilder::new();
-        builder
-            .set_headers(incoming_headers)
-            //.set_header("content-type", "text/html")
-            //.set_header(
-            //    "content-length",
-            //    &include_str!("index.html").len().to_string(),
-            //)
-            .set_status_code(200)
-            .set_body(include_str!("index.html"));
-        builder.build(resp);
+        // stream
+        let resp_tx = OutgoingResponse::new(response_headers);
+        let _ = resp_tx.set_status_code(200);
+        let body = resp_tx.body().unwrap();
+        ResponseOutparam::set(resp, Ok(resp_tx));
+
+        // stream the response body
+        let stream = body.write().unwrap();
+        stream.write(index.as_bytes()).unwrap();
+        //while let Ok(chunk) = example_stream.read(8192) {
+        //    let _ = stream.write(&chunk);
+        //}
+        // finish the response -> drop flushes the stream
+        drop(stream);
+        // this tells the host that the response is complete
+        let _ = OutgoingBody::finish(body, None);
     }
 }
 
