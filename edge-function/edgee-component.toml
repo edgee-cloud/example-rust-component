@@ -1,8 +1,8 @@
 manifest-version = 1
 
 [component]
-name = "test echo component"
-version = "10.0.5"
+name = "example-rust-edge-function-component"
+version = "1.0.0"
 
 category = "edge-function"
 subcategory = "wasm-function"
