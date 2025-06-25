@@ -2,6 +2,8 @@ wit_bindgen::generate!({world: "edge-function", path: ".edgee/wit", generate_all
 export!(Component);
 struct Component;
 
+use std::collections::HashMap;
+
 use exports::wasi::http::incoming_handler::{Guest, ResponseOutparam};
 use wasi::http::types::IncomingRequest;
 use wasi::http::types::{Fields, OutgoingBody, OutgoingResponse};
@@ -10,6 +12,12 @@ pub struct ResponseBuilder {
     headers: Fields,
     status_code: u16,
     body_content: Option<String>,
+}
+
+impl Default for ResponseBuilder {
+    fn default() -> Self {
+        ResponseBuilder::new()
+    }
 }
 
 impl ResponseBuilder {
@@ -39,14 +47,14 @@ impl ResponseBuilder {
     }
 
     pub fn build(self, resp: ResponseOutparam) {
-        let mut resp_tx = OutgoingResponse::new(self.headers);
+        let resp_tx = OutgoingResponse::new(self.headers);
         let _ = resp_tx.set_status_code(self.status_code);
 
         if let Some(body_content) = self.body_content {
             let body = resp_tx.body().unwrap();
             ResponseOutparam::set(resp, Ok(resp_tx));
 
-            let mut stream = body.write().unwrap();
+            let stream = body.write().unwrap();
             stream
                 .blocking_write_and_flush(body_content.as_bytes())
                 .unwrap();
@@ -55,6 +63,21 @@ impl ResponseBuilder {
             let _ = OutgoingBody::finish(body, None);
         }
     }
+}
+
+fn parse_headers(headers: &Fields) -> HashMap<String, Vec<String>> {
+    let mut output: HashMap<String, Vec<String>> = HashMap::new();
+    for (header_name, header_value) in headers.entries() {
+        let header_name = header_name.to_string();
+        let header_value = String::from_utf8_lossy(&header_value).to_string();
+        if output.contains_key(&header_name) {
+            output.get_mut(&header_name).unwrap().push(header_value);
+        } else {
+            output.insert(header_name, vec![header_value]);
+        }
+    }
+
+    output
 }
 
 impl Guest for Component {
