@@ -82,17 +82,22 @@ fn parse_headers(headers: &Fields) -> HashMap<String, Vec<String>> {
 
 impl Guest for Component {
     fn handle(req: wasi::http::types::IncomingRequest, resp: wasi::http::types::ResponseOutparam) {
-        let incoming_headers = IncomingRequest::headers(&req);
+        let incoming_headers = parse_headers(&IncomingRequest::headers(&req));
+
+        let example = waki::Client::new()
+            .get("https://example.com")
+            .send()
+            .unwrap()
+            .body()
+            .unwrap();
+
+        let body = String::from_utf8_lossy(&example).to_string();
 
         let mut builder = ResponseBuilder::new();
         builder
             .set_header("content-type", "text/html")
-            .set_header(
-                "content-length",
-                &include_str!("index.html").len().to_string(),
-            )
             .set_status_code(200)
-            .set_body(include_str!("index.html"));
+            .set_body(body.as_str());
         builder.build(resp);
     }
 }
