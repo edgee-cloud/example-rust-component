@@ -70,11 +70,10 @@ fn parse_headers(headers: &Fields) -> HashMap<String, Vec<String>> {
     for (header_name, header_value) in headers.entries() {
         let header_name = header_name.to_string();
         let header_value = String::from_utf8_lossy(&header_value).to_string();
-        if output.contains_key(&header_name) {
-            output.get_mut(&header_name).unwrap().push(header_value);
-        } else {
-            output.insert(header_name, vec![header_value]);
-        }
+        output
+            .entry(header_name.clone())
+            .or_default()
+            .push(header_value);
     }
 
     output
@@ -84,20 +83,20 @@ impl Guest for Component {
     fn handle(req: wasi::http::types::IncomingRequest, resp: wasi::http::types::ResponseOutparam) {
         let incoming_headers = parse_headers(&IncomingRequest::headers(&req));
 
-        let example = waki::Client::new()
-            .get("https://example.com")
-            .send()
-            .unwrap()
-            .body()
-            .unwrap();
+        //let example = waki::Client::new()
+        //    .get("https://example.com")
+        //    .send()
+        //    .unwrap()
+        //    .body()
+        //    .unwrap();
 
-        let body = String::from_utf8_lossy(&example).to_string();
+        //let body = String::from_utf8_lossy(&example).to_string();
 
         let mut builder = ResponseBuilder::new();
         builder
             .set_header("content-type", "text/html")
             .set_status_code(200)
-            .set_body(body.as_str());
+            .set_body(include_str!("index.html"));
         builder.build(resp);
     }
 }
