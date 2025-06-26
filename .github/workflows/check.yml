@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dir: [data-collection]
+        dir: [data-collection, edge-function]
     defaults:
       run:
         working-directory: ${{ matrix.dir }}
