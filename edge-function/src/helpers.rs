@@ -49,9 +49,7 @@ impl ResponseBuilder {
         ResponseOutparam::set(resp, Ok(resp_tx));
         let stream = body.write().unwrap();
         if let Some(body_content) = self.body_content {
-            stream
-                .blocking_write_and_flush(body_content.as_bytes())
-                .unwrap();
+            let _ = stream.write(body_content.as_bytes());
         }
         drop(stream);
         let _ = OutgoingBody::finish(body, None);
