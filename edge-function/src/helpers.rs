@@ -78,14 +78,14 @@ pub fn parse_body(req: IncomingRequest) -> Result<Vec<u8>, String> {
     let mut request_body = Vec::new();
     let stream = match req.consume() {
         Ok(stream) => stream,
-        Err(e) => {
-            return Err(format!("Failed to consume request stream"));
+        Err(_) => {
+            return Err("Failed to consume request stream".to_string());
         }
     };
     let stream = match stream.stream() {
         Ok(stream) => stream,
-        Err(e) => {
-            return Err(format!("Failed to get request stream: "));
+        Err(_) => {
+            return Err("Failed to get request stream".to_string());
         }
     };
 
