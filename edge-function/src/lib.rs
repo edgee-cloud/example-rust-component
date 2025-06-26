@@ -4,13 +4,14 @@ mod world;
 use std::collections::HashMap;
 
 use world::bindings::exports::wasi::http::incoming_handler::Guest;
+use world::bindings::wasi::http::types::Fields;
 use world::bindings::wasi::http::types::IncomingRequest;
 use world::bindings::wasi::http::types::ResponseOutparam;
 use world::bindings::Component;
 
 impl Guest for Component {
     fn handle(req: IncomingRequest, resp: ResponseOutparam) {
-        let _ = match Settings::new(&req) {
+        let _ = match Settings::from_req(&req) {
             Ok(settings) => settings,
             Err(_) => {
                 let mut builder = helpers::ResponseBuilder::new();
@@ -48,9 +49,12 @@ pub struct Settings {
 }
 
 impl Settings {
-    pub fn new(req: &IncomingRequest) -> anyhow::Result<Self> {
-        let headers = IncomingRequest::headers(req);
-        let map = helpers::parse_headers(&headers);
+    pub fn from_req(req: &IncomingRequest) -> anyhow::Result<Self> {
+        Self::new(&IncomingRequest::headers(req))
+    }
+
+    pub fn new(headers: &Fields) -> anyhow::Result<Self> {
+        let map = helpers::parse_headers(headers);
         let settings = map
             .get("x-edgee-component-settings")
             .ok_or_else(|| anyhow::anyhow!("Missing 'x-edgee-component-settings' header"))?;
@@ -70,5 +74,21 @@ impl Settings {
             .unwrap_or_default();
 
         Ok(Self { example })
+    }
+}
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_settings_new() {
+        let headers = Fields::new();
+        let _ = headers.append(
+            "x-edgee-component-settings",
+            r#"{"example": "test_value"}"#.as_bytes(),
+        );
+
+        let settings = Settings::new(&headers).unwrap();
+        assert_eq!(settings.example, "test_value");
     }
 }
