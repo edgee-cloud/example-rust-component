@@ -4,7 +4,6 @@ mod world;
 use std::collections::HashMap;
 
 use world::bindings::exports::wasi::http::incoming_handler::Guest;
-use world::bindings::wasi::http::types::Fields;
 use world::bindings::wasi::http::types::IncomingRequest;
 use world::bindings::wasi::http::types::ResponseOutparam;
 use world::bindings::Component;
@@ -77,6 +76,7 @@ impl Settings {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
