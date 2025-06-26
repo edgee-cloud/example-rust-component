@@ -31,12 +31,13 @@ impl Guest for Component {
         //    .unwrap();
 
         //let body = String::from_utf8_lossy(&example).to_string();
+        let body = include_str!("index.html");
 
         let mut builder = helpers::ResponseBuilder::new();
         builder
             .set_header("content-type", "text/html")
             .set_status_code(200)
-            .set_body(include_str!("index.html"));
+            .set_body(body);
         builder.build(resp);
     }
 }
