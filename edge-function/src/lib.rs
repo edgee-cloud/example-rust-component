@@ -50,12 +50,12 @@ pub struct Settings {
 
 impl Settings {
     pub fn from_req(req: &IncomingRequest) -> anyhow::Result<Self> {
-        Self::new(&IncomingRequest::headers(req))
+        let map = helpers::parse_headers(&IncomingRequest::headers(req));
+        Self::new(&map)
     }
 
-    pub fn new(headers: &Fields) -> anyhow::Result<Self> {
-        let map = helpers::parse_headers(headers);
-        let settings = map
+    pub fn new(headers: &HashMap<String, Vec<String>>) -> anyhow::Result<Self> {
+        let settings = headers
             .get("x-edgee-component-settings")
             .ok_or_else(|| anyhow::anyhow!("Missing 'x-edgee-component-settings' header"))?;
 
@@ -82,10 +82,10 @@ mod tests {
 
     #[test]
     fn test_settings_new() {
-        let headers = Fields::new();
-        let _ = headers.append(
-            "x-edgee-component-settings",
-            r#"{"example": "test_value"}"#.as_bytes(),
+        let mut headers = HashMap::new();
+        headers.insert(
+            "x-edgee-component-settings".to_string(),
+            vec![r#"{"example": "test_value"}"#.to_string()],
         );
 
         let settings = Settings::new(&headers).unwrap();
