@@ -45,18 +45,16 @@ impl ResponseBuilder {
         let resp_tx = OutgoingResponse::new(self.headers);
         let _ = resp_tx.set_status_code(self.status_code);
 
+        let body = resp_tx.body().unwrap();
+        ResponseOutparam::set(resp, Ok(resp_tx));
+        let stream = body.write().unwrap();
         if let Some(body_content) = self.body_content {
-            let body = resp_tx.body().unwrap();
-            ResponseOutparam::set(resp, Ok(resp_tx));
-
-            let stream = body.write().unwrap();
             stream
                 .blocking_write_and_flush(body_content.as_bytes())
                 .unwrap();
-            drop(stream);
-
-            let _ = OutgoingBody::finish(body, None);
         }
+        drop(stream);
+        let _ = OutgoingBody::finish(body, None);
     }
 }
 
