@@ -81,7 +81,7 @@ fn parse_headers(headers: &Fields) -> HashMap<String, Vec<String>> {
 
 impl Guest for Component {
     fn handle(req: wasi::http::types::IncomingRequest, resp: wasi::http::types::ResponseOutparam) {
-        let incoming_headers = parse_headers(&IncomingRequest::headers(&req));
+        let _ = parse_headers(&IncomingRequest::headers(&req));
 
         //let example = waki::Client::new()
         //    .get("https://example.com")
