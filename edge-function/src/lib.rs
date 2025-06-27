@@ -10,15 +10,14 @@ use world::bindings::Component;
 
 impl Guest for Component {
     fn handle(req: IncomingRequest, resp: ResponseOutparam) {
+
+        let body = include_str!("index.html");
+
         let _ = match Settings::from_req(&req) {
             Ok(settings) => settings,
             Err(_) => {
-                let mut builder = helpers::ResponseBuilder::new();
-                builder
-                    .set_header("content-type", "text/html")
-                    .set_status_code(200)
-                    .set_body(include_str!("index.html"));
-                builder.build(resp);
+                let response = helpers::build_response_html(body, 200);
+                response.send(resp);
                 return;
             }
         };
@@ -31,16 +30,11 @@ impl Guest for Component {
         //    .unwrap()
         //    .body()
         //    .unwrap();
-
         //let body = String::from_utf8_lossy(&example).to_string();
-        let body = include_str!("index.html");
+        
+        let response = helpers::build_response_html(body, 200);
+        response.send(resp);
 
-        let mut builder = helpers::ResponseBuilder::new();
-        builder
-            .set_header("content-type", "text/html")
-            .set_status_code(200)
-            .set_body(body);
-        builder.build(resp);
     }
 }
 
