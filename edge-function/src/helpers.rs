@@ -1,4 +1,8 @@
-use crate::world::bindings::wasi::http::types::{Fields, OutgoingBody, OutgoingResponse};
+use crate::world::bindings::wasi::http::types::{
+    Fields, IncomingRequest, OutgoingBody, OutgoingResponse,
+};
+
+use crate::world::bindings::wasi::io::streams::StreamError;
 
 use crate::world::bindings::exports::wasi::http::incoming_handler::ResponseOutparam;
 use std::collections::HashMap;
@@ -49,9 +53,7 @@ impl ResponseBuilder {
         ResponseOutparam::set(resp, Ok(resp_tx));
         let stream = body.write().unwrap();
         if let Some(body_content) = self.body_content {
-            stream
-                .blocking_write_and_flush(body_content.as_bytes())
-                .unwrap();
+            let _ = stream.write(body_content.as_bytes());
         }
         drop(stream);
         let _ = OutgoingBody::finish(body, None);
@@ -70,4 +72,39 @@ pub fn parse_headers(headers: &Fields) -> HashMap<String, Vec<String>> {
     }
 
     output
+}
+
+pub fn parse_body(req: IncomingRequest) -> Result<Vec<u8>, String> {
+    let mut request_body = Vec::new();
+    let stream = match req.consume() {
+        Ok(stream) => stream,
+        Err(_) => {
+            return Err("Failed to consume request stream".to_string());
+        }
+    };
+    let stream = match stream.stream() {
+        Ok(stream) => stream,
+        Err(_) => {
+            return Err("Failed to get request stream".to_string());
+        }
+    };
+
+    loop {
+        match stream.read(4096) {
+            Ok(chunk) => {
+                if chunk.is_empty() {
+                    break;
+                }
+                request_body.extend_from_slice(&chunk);
+            }
+            Err(StreamError::Closed) => {
+                // Stream is closed, we can stop reading
+                break;
+            }
+            Err(e) => {
+                return Err(format!("Failed to read from request stream: {e}"));
+            }
+        }
+    }
+    Ok(request_body)
 }

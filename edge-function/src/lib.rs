@@ -23,6 +23,8 @@ impl Guest for Component {
             }
         };
 
+        let _ = helpers::parse_body(req);
+
         //let example = waki::Client::new()
         //    .get("https://example.com")
         //    .send()
