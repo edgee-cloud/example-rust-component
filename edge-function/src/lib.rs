@@ -10,7 +10,6 @@ use world::bindings::Component;
 
 impl Guest for Component {
     fn handle(req: IncomingRequest, resp: ResponseOutparam) {
-
         let body = include_str!("index.html");
 
         let _ = match Settings::from_req(&req) {
@@ -24,17 +23,36 @@ impl Guest for Component {
 
         let _ = helpers::parse_body(req);
 
-        //let example = waki::Client::new()
+        // Uncomment the following lines to see how to use the waki client
+        // let example = waki::Client::new()
         //    .get("https://example.com")
         //    .send()
         //    .unwrap()
         //    .body()
         //    .unwrap();
-        //let body = String::from_utf8_lossy(&example).to_string();
-        
+        // let body = String::from_utf8_lossy(&example).to_string();
+
+        // Uncomment the following lines to see how to parse the request body and parse it to JSON
+        // let request_body = match helpers::parse_body(req) {
+        //     Ok(body) => body,
+        //     Err(e) => {
+        //         let response = helpers::build_response_json_error(&e, 400);
+        //         response.send(resp);
+        //         return;
+        //     }
+        // };
+        // // parse body to JSON
+        // let body_json: serde_json::Value = match serde_json::from_slice(&request_body) {
+        //     Ok(json) => json,
+        //     Err(_) => {
+        //         let response = helpers::build_response_json_error("Invalid JSON in request body", 400);
+        //         response.send(resp);
+        //         return;
+        //     }
+        // };
+
         let response = helpers::build_response_html(body, 200);
         response.send(resp);
-
     }
 }
 
