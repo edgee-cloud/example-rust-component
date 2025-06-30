@@ -5,10 +5,6 @@ use crate::world::bindings::wasi::http::types::{
 use crate::world::bindings::wasi::io::streams::StreamError;
 
 use crate::world::bindings::exports::wasi::http::incoming_handler::ResponseOutparam;
-use crate::world::bindings::wasi::http::types::{
-    Fields, IncomingRequest, OutgoingBody, OutgoingResponse,
-};
-use crate::world::bindings::wasi::io::streams::StreamError;
 use std::collections::HashMap;
 
 pub struct ResponseBuilder {
@@ -125,10 +121,12 @@ pub fn build_response_html(body: &str, status_code: u16) -> ResponseBuilder {
     build_response(body, status_code, "text/html; charset=utf-8")
 }
 
+#[allow(dead_code)]
 pub fn build_response_json(body: &str, status_code: u16) -> ResponseBuilder {
     build_response(body, status_code, "application/json")
 }
 
+#[allow(dead_code)]
 pub fn build_response_json_error(message: &str, status_code: u16) -> ResponseBuilder {
     let body = format!("{{\"error\": \"{message}\"}}");
     build_response_json(&body, status_code)
