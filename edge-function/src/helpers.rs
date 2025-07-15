@@ -132,6 +132,17 @@ pub fn build_response_json_error(message: &str, status_code: u16) -> ResponseBui
     build_response_json(&body, status_code)
 }
 
+#[allow(dead_code)]
+pub fn build_response_redirect(url: &str) -> ResponseBuilder {
+    let mut builder = ResponseBuilder::new();
+    builder
+        .set_header("content-type", "text/plain")
+        .set_header("Location", url)
+        .set_status_code(302)
+        .set_body("");
+    builder
+}
+
 //#[cfg(test)]
 //mod tests {
 //    use super::*;
