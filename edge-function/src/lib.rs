@@ -1,108 +1,81 @@
-mod helpers;
-mod world;
-
 use std::collections::HashMap;
 
-use world::bindings::exports::wasi::http::incoming_handler::Guest;
-use world::bindings::wasi::http::types::IncomingRequest;
-use world::bindings::wasi::http::types::ResponseOutparam;
-use world::bindings::Component;
+use bytes::Bytes;
 
-impl Guest for Component {
-    fn handle(req: IncomingRequest, resp: ResponseOutparam) {
-        let body = include_str!("index.html");
+use bindings::wasi::http::types::{IncomingRequest, ResponseOutparam};
 
-        let _ = match Settings::from_req(&req) {
-            Ok(settings) => settings,
-            Err(_) => {
-                let response = helpers::build_response_html(body, 200);
-                response.send(resp);
-                return;
-            }
-        };
+mod bindings {
+    wit_bindgen::generate!({
+        path: ".edgee/wit",
+        world: "edge-function",
+        generate_all,
+        pub_export_macro: true,
+        default_bindings_module: "$crate::bindings",
+    });
+}
+mod helpers;
 
-        let _ = helpers::parse_body(req);
+struct Component;
+bindings::export!(Component);
 
-        // Uncomment the following lines to see how to use the waki client
-        // let example = waki::Client::new()
-        //    .get("https://example.com")
-        //    .send()
-        //    .unwrap()
-        //    .body()
-        //    .unwrap();
-        // let body = String::from_utf8_lossy(&example).to_string();
+impl bindings::exports::wasi::http::incoming_handler::Guest for Component {
+    fn handle(req: IncomingRequest, response_out: ResponseOutparam) {
+        helpers::run(req, response_out, |req| {
+            let _settings = Settings::from_req(&req)?;
 
-        // Uncomment the following lines to see how to parse the request body and parse it to JSON
-        // let request_body = match helpers::parse_body(req) {
-        //     Ok(body) => body,
-        //     Err(e) => {
-        //         let response = helpers::build_response_json_error(&e, 400);
-        //         response.send(resp);
-        //         return;
-        //     }
-        // };
-        // // parse body to JSON
-        // let body_json: serde_json::Value = match serde_json::from_slice(&request_body) {
-        //     Ok(json) => json,
-        //     Err(_) => {
-        //         let response = helpers::build_response_json_error("Invalid JSON in request body", 400);
-        //         response.send(resp);
-        //         return;
-        //     }
-        // };
+            let body = Bytes::from_static(include_bytes!(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/public/index.html"
+            )));
 
-        let response = helpers::build_response_html(body, 200);
-        response.send(resp);
+            // Uncomment the following lines to see how to use the waki client
+            // let example = waki::Client::new()
+            //    .get("https://example.com")
+            //    .send()
+            //    .unwrap()
+            //    .body()
+            //    .unwrap();
+            // let body = String::from_utf8_lossy(&example).to_string();
+
+            Ok(http::Response::builder()
+                .status(200)
+                .header("Content-Type", "text/html; charset=utf-8")
+                .body(body)?)
+        });
+
+        // Or use the following handler to see how to handle a JSON request
+        // helpers::run_json::<_, serde_json::Value, _>(req, response_out, |req| {
+        //     let _settings = Settings::from_req(&req)?;
+        //
+        //     Ok(http::Response::builder()
+        //         .status(200)
+        //         .body(serde_json::json!({
+        //             "status": "success",
+        //             "input": req.body(),
+        //         }))?)
+        // });
     }
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Settings {
-    pub example: String,
+    example: String,
 }
 
 impl Settings {
-    pub fn from_req(req: &IncomingRequest) -> anyhow::Result<Self> {
-        let map = helpers::parse_headers(&IncomingRequest::headers(req));
-        Self::new(&map)
-    }
-
-    pub fn new(headers: &HashMap<String, Vec<String>>) -> anyhow::Result<Self> {
-        let settings = headers
+    pub fn new(headers: &http::header::HeaderMap) -> anyhow::Result<Self> {
+        let value = headers
             .get("x-edgee-component-settings")
-            .ok_or_else(|| anyhow::anyhow!("Missing 'x-edgee-component-settings' header"))?;
+            .ok_or_else(|| anyhow::anyhow!("Missing 'x-edgee-component-settings' header"))
+            .and_then(|value| value.to_str().map_err(Into::into))?;
+        let data: HashMap<String, String> = serde_json::from_str(value)?;
 
-        if settings.len() != 1 {
-            return Err(anyhow::anyhow!(
-                "Expected exactly one 'x-edgee-component-settings' header, found {}",
-                settings.len()
-            ));
-        }
-        let setting = settings[0].clone();
-        let setting: HashMap<String, String> = serde_json::from_str(&setting)?;
-
-        let example = setting
-            .get("example")
-            .map(String::to_string)
-            .unwrap_or_default();
-
-        Ok(Self { example })
+        Ok(Self {
+            example: data["example"].to_string(),
+        })
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_settings_new() {
-        let mut headers = HashMap::new();
-        headers.insert(
-            "x-edgee-component-settings".to_string(),
-            vec![r#"{"example": "test_value"}"#.to_string()],
-        );
-
-        let settings = Settings::new(&headers).unwrap();
-        assert_eq!(settings.example, "test_value");
+    pub fn from_req<B>(req: &http::Request<B>) -> anyhow::Result<Self> {
+        Self::new(req.headers())
     }
 }
