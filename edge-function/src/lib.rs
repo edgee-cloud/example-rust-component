@@ -20,7 +20,9 @@ bindings::export!(Component);
 
 impl bindings::exports::wasi::http::incoming_handler::Guest for Component {
     fn handle(req: IncomingRequest, response_out: ResponseOutparam) {
-        helpers::run(req, response_out, |req| {
+        helpers::run(req, response_out, |req: http::Request<()>| {
+            use helpers::body::Html;
+
             let _settings = Settings::from_req(&req)?;
 
             let body = Bytes::from_static(include_bytes!(concat!(
@@ -30,30 +32,49 @@ impl bindings::exports::wasi::http::incoming_handler::Guest for Component {
 
             // Uncomment the following lines to see how to use the waki client
             // let example = waki::Client::new()
-            //    .get("https://example.com")
-            //    .send()
-            //    .unwrap()
-            //    .body()
-            //    .unwrap();
+            //     .get("https://example.com")
+            //     .send()?
+            //     .body()?;
             // let body = String::from_utf8_lossy(&example).to_string();
 
-            Ok(http::Response::builder()
-                .status(200)
-                .header("Content-Type", "text/html; charset=utf-8")
-                .body(body)?)
+            Ok(http::Response::builder().status(200).body(Html(body))?)
         });
 
         // Or use the following handler to see how to handle a JSON request
-        // helpers::run_json::<_, serde_json::Value, _>(req, response_out, |req| {
-        //     let _settings = Settings::from_req(&req)?;
+        // use helpers::body::Json;
+        // helpers::run(
+        //     req,
+        //     response_out,
+        //     |req: http::Request<Json<serde_json::Value>>| {
+        //         let _settings = Settings::from_req(&req)?;
         //
-        //     Ok(http::Response::builder()
-        //         .status(200)
-        //         .body(serde_json::json!({
-        //             "status": "success",
-        //             "input": req.body(),
-        //         }))?)
-        // });
+        //         let Json(data) = req.body();
+        //
+        //         Ok(http::Response::builder()
+        //             .status(200)
+        //             .body(Json(serde_json::json!({
+        //                 "status": "success",
+        //                 "input": data,
+        //             })))?)
+        //     },
+        // );
+
+        // You can even mix up types
+        // use helpers::body::{Html, Json};
+        // helpers::run(
+        //     req,
+        //     response_out,
+        //     |req: http::Request<Json<serde_json::Value>>| {
+        //         let Json(_data) = req.into_body();
+        //
+        //         let body = Bytes::from_static(include_bytes!(concat!(
+        //             env!("CARGO_MANIFEST_DIR"),
+        //             "/public/index.html"
+        //         )));
+        //
+        //         Ok(http::Response::builder().status(200).body(Html(body))?)
+        //     },
+        // );
     }
 }
 
