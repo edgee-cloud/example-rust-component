@@ -87,9 +87,9 @@ impl IntoBody for String {
 impl<T: FromBody> FromBody for Option<T> {
     fn from_data(data: Bytes) -> Result<Self> {
         if data.is_empty() {
-            Ok(Some(T::from_data(data)?))
-        } else {
             Ok(None)
+        } else {
+            Ok(Some(T::from_data(data)?))
         }
     }
 }
@@ -140,7 +140,7 @@ impl<T: serde::Serialize> IntoBody for Json<T> {
             .header(http::header::CONTENT_TYPE, "application/json")
             .body(
                 serde_json::to_vec(&serde_json::json!({
-                    "error": "Internal server error",
+                    "error": status_code.canonical_reason().unwrap_or("Internal server error"),
                     "message": err.to_string(),
                 }))
                 .unwrap()
@@ -157,6 +157,7 @@ impl<T: serde::Serialize> IntoBody for Json<T> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct RawJson<T>(pub T);
 
 impl<T: Into<Bytes>> IntoBody for RawJson<T> {
