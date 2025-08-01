@@ -1,7 +1,6 @@
 use crate::bindings::wasi::http::types::IncomingBody;
 use anyhow::Result;
 use bytes::Bytes;
-use http::{Response, StatusCode};
 
 pub trait FromBody: Sized {
     fn from_data(data: Bytes) -> Result<Self>;
@@ -13,7 +12,6 @@ pub trait FromBody: Sized {
 
 pub trait IntoBody: Sized {
     fn into_body(self) -> Result<Bytes>;
-    fn handle_error(status_code: StatusCode, err: anyhow::Error) -> Response<Bytes>;
 
     #[allow(unused_variables)]
     fn extend_response_parts(&self, parts: &mut http::response::Parts) {}
@@ -39,13 +37,6 @@ impl IntoBody for Bytes {
     fn into_body(self) -> Result<Bytes> {
         Ok(self)
     }
-
-    fn handle_error(status_code: StatusCode, _err: anyhow::Error) -> Response<Bytes> {
-        http::Response::builder()
-            .status(status_code)
-            .body(Bytes::new())
-            .unwrap()
-    }
 }
 
 impl FromBody for () {
@@ -62,10 +53,6 @@ impl IntoBody for () {
     fn into_body(self) -> Result<Bytes> {
         Ok(Bytes::new())
     }
-
-    fn handle_error(status_code: StatusCode, err: anyhow::Error) -> Response<Bytes> {
-        Bytes::handle_error(status_code, err)
-    }
 }
 
 impl FromBody for String {
@@ -77,10 +64,6 @@ impl FromBody for String {
 impl IntoBody for String {
     fn into_body(self) -> Result<Bytes> {
         Ok(Bytes::from(self))
-    }
-
-    fn handle_error(status_code: StatusCode, err: anyhow::Error) -> Response<Bytes> {
-        Bytes::handle_error(status_code, err)
     }
 }
 
@@ -100,10 +83,6 @@ impl<T: IntoBody> IntoBody for Option<T> {
             Some(value) => value.into_body(),
             None => Ok(Bytes::new()),
         }
-    }
-
-    fn handle_error(status_code: StatusCode, err: anyhow::Error) -> Response<Bytes> {
-        T::handle_error(status_code, err)
     }
 
     fn extend_response_parts(&self, parts: &mut http::response::Parts) {
@@ -134,21 +113,6 @@ impl<T: serde::Serialize> IntoBody for Json<T> {
         Ok(buf.into_inner().freeze())
     }
 
-    fn handle_error(status_code: StatusCode, err: anyhow::Error) -> Response<Bytes> {
-        http::Response::builder()
-            .status(status_code)
-            .header(http::header::CONTENT_TYPE, "application/json")
-            .body(
-                serde_json::to_vec(&serde_json::json!({
-                    "error": status_code.canonical_reason().unwrap_or("Internal server error"),
-                    "message": err.to_string(),
-                }))
-                .unwrap()
-                .into(),
-            )
-            .unwrap()
-    }
-
     fn extend_response_parts(&self, parts: &mut http::response::Parts) {
         parts
             .headers
@@ -164,9 +128,6 @@ impl<T: Into<Bytes>> IntoBody for RawJson<T> {
     fn into_body(self) -> Result<Bytes> {
         Ok(self.0.into())
     }
-    fn handle_error(status_code: StatusCode, err: anyhow::Error) -> Response<Bytes> {
-        Json::<()>::handle_error(status_code, err)
-    }
 
     fn extend_response_parts(&self, parts: &mut http::response::Parts) {
         Json(()).extend_response_parts(parts)
@@ -179,14 +140,6 @@ pub struct Html<T>(pub T);
 impl<T: Into<Bytes>> IntoBody for Html<T> {
     fn into_body(self) -> Result<Bytes> {
         Ok(self.0.into())
-    }
-
-    fn handle_error(status_code: StatusCode, _err: anyhow::Error) -> Response<Bytes> {
-        http::Response::builder()
-            .status(status_code)
-            .header(http::header::CONTENT_TYPE, "text/html")
-            .body(super::ERROR_PAGE)
-            .unwrap()
     }
 
     fn extend_response_parts(&self, parts: &mut http::response::Parts) {

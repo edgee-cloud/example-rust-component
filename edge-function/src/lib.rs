@@ -25,10 +25,18 @@ impl bindings::exports::wasi::http::incoming_handler::Guest for Component {
 
             let _settings = Settings::from_req(&req)?;
 
-            let body = Bytes::from_static(include_bytes!(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/public/index.html"
-            )));
+            let body = Bytes::from_static(
+                br#"
+                <html lang="en>
+                    <head>
+                        <title>Edgee Edge Function Component</title>
+                    </head>
+                    <body>
+                        <p>Hello world</p>
+                    </body>
+                </html>
+            "#,
+            );
 
             // Uncomment the following lines to see how to use the waki client
             // let example = waki::Client::new()
