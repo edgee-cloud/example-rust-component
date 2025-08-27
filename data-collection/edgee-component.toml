@@ -34,7 +34,7 @@ Describe **what this component does** and why it exists.
 
 ---
 
-Additional resources: [Resource example](https://your-resource-link.com)
+Additional resources: add your links there.
 '''
 documentation = "https://github.com/edgee-cloud/example-rust-component"
 repository = "https://github.com/edgee-cloud/example-rust-component"
