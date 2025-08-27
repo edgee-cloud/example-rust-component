@@ -6,7 +6,36 @@ version = "1.0.0"
 
 category = "data-collection"
 subcategory = "analytics"
-description = "Example Rust component for data collection"
+description = '''
+## Overview
+
+Describe **what this component does** and why it exists.
+
+---
+
+## Key Features & Benefits
+
+### Features
+
+- **Feature example**: Quick feature description.
+- **Another feature**: Optional additional detail.
+
+### Benefits
+
+- **Benefit example**: Quick benefit description.
+- **Another benefit**: Optional additional detail.
+
+---
+
+## Use Cases
+
+- **Use Case Example**: Quick use case description.
+- **Another use case**: Optional context.
+
+---
+
+Additional resources: [Resource example](https://your-resource-link.com)
+'''
 documentation = "https://github.com/edgee-cloud/example-rust-component"
 repository = "https://github.com/edgee-cloud/example-rust-component"
 language = "Rust"
