@@ -6,8 +6,7 @@ version = "1.0.0"
 
 category = "edge-function"
 subcategory = "wasm-function"
-description = "Example Rust component for edge function"
-documentation = '''
+description = '''
 ## Overview
 
 Describe **what this component does** and why it exists.
@@ -35,8 +34,9 @@ Describe **what this component does** and why it exists.
 
 ---
 
-Additional resources: add your links there.
+Additional resources: [Resource example](https://your-resource-link.com)
 '''
+documentation = "https://github.com/edgee-cloud/example-rust-component"
 repository = "https://github.com/edgee-cloud/example-rust-component"
 language = "Rust"
 wit-version = "1.0.0"
